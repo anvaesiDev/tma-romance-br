@@ -18,7 +18,7 @@ const CreateInvoiceSchema = z.object({
  * Create a Stars invoice link
  */
 paymentsRoutes.post('/create-invoice', async (c) => {
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
     const body = await c.req.json();
     const parsed = CreateInvoiceSchema.safeParse(body);
 
@@ -183,7 +183,7 @@ paymentsRoutes.post('/mock-complete', async (c) => {
         return c.json({ error: 'Not available in production' }, 403);
     }
 
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
     const body = await c.req.json();
     const { paymentId } = body;
 
@@ -248,7 +248,7 @@ paymentsRoutes.post('/mock-complete', async (c) => {
  * Get user's active entitlements
  */
 paymentsRoutes.get('/entitlements', async (c) => {
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
 
     const entitlements = await prisma.entitlement.findMany({
         where: {

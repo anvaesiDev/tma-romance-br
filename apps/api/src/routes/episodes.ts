@@ -10,7 +10,7 @@ export const episodesRoutes = new Hono();
  */
 episodesRoutes.get('/:id', authMiddleware, async (c) => {
     const id = c.req.param('id');
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
 
     const episode = await prisma.episode.findUnique({
         where: { id },
@@ -86,7 +86,7 @@ episodesRoutes.get('/:id', authMiddleware, async (c) => {
 episodesRoutes.get('/by-number/:seriesSlug/:number', authMiddleware, async (c) => {
     const seriesSlug = c.req.param('seriesSlug');
     const number = parseInt(c.req.param('number'));
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
 
     const series = await prisma.series.findUnique({
         where: { slug: seriesSlug },

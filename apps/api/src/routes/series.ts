@@ -83,7 +83,7 @@ seriesRoutes.get('/:slug', async (c) => {
  */
 seriesRoutes.get('/:slug/progress', authMiddleware, async (c) => {
     const slug = c.req.param('slug');
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
 
     const series = await prisma.series.findUnique({
         where: { slug },

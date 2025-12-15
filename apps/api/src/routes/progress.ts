@@ -21,7 +21,7 @@ const SaveProgressSchema = z.object({
  * Save user progress
  */
 progressRoutes.post('/', async (c) => {
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
     const body = await c.req.json();
     const parsed = SaveProgressSchema.safeParse(body);
 
@@ -60,7 +60,7 @@ progressRoutes.post('/', async (c) => {
  * Get all user progress (for continue cards)
  */
 progressRoutes.get('/', async (c) => {
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
 
     const progressList = await prisma.progress.findMany({
         where: { userId },
@@ -105,7 +105,7 @@ progressRoutes.get('/', async (c) => {
  * Mark episode as complete
  */
 progressRoutes.post('/complete-episode', async (c) => {
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
     const body = await c.req.json();
 
     const { seriesId, episodeId, secondsSpent } = body;
@@ -152,7 +152,7 @@ progressRoutes.post('/complete-episode', async (c) => {
  * Track choice made
  */
 progressRoutes.post('/choice', async (c) => {
-    const userId = c.get('userId');
+    const userId = c.get('userId') as string;
     const body = await c.req.json();
 
     const { choiceId, optionId, routeFlags, meters } = body;
