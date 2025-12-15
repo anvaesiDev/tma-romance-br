@@ -56,7 +56,7 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
             }
         } catch (err: any) {
             console.error('Failed to load episode:', err);
-            setError(err.message || 'Ошибка загрузки');
+            setError(err.message || 'Erro ao carregar');
         } finally {
             isLoading.value = false;
         }
@@ -189,7 +189,7 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
             <div class="screen" style="display: flex; align-items: center; justify-content: center;">
                 <div style="text-align: center;">
                     <div style="font-size: 48px; animation: pulse 1.5s infinite;">📖</div>
-                    <p class="text-secondary" style="margin-top: 16px;">Загрузка…</p>
+                    <p class="text-secondary" style="margin-top: 16px;">Carregando...</p>
                 </div>
             </div>
         );
@@ -203,7 +203,7 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
                     <div style="font-size: 48px;">❌</div>
                     <p class="text-secondary" style="margin-top: 16px;">{error}</p>
                     <button onClick={loadEpisode} class="btn-secondary" style="margin-top: 16px;">
-                        Попробовать снова
+                        Tentar novamente
                     </button>
                 </div>
             </div>
@@ -218,7 +218,7 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
                     <div class="toast">
                         <div class="toast-icon">💬</div>
                         <div class="toast-content">
-                            <p class="toast-title">Новое сообщение</p>
+                            <p class="toast-title">Nova mensagem</p>
                             <p class="toast-text">{toastMessage}</p>
                         </div>
                     </div>
@@ -232,13 +232,13 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
                         onClick={() => navigate({ page: 'story', slug: seriesSlug })}
                         style="color: var(--text-muted); font-size: 14px;"
                     >
-                        ← Назад
+                        ← Voltar
                     </button>
 
                     <div style="text-align: center;">
                         <p style="font-size: 14px; font-weight: 500;">{currentEpisode.value?.seriesTitle}</p>
                         <p style="font-size: 12px; color: var(--text-muted);">
-                            Эп. {currentEpisode.value?.number}: {currentEpisode.value?.titlePt}
+                            Ep. {currentEpisode.value?.number}: {currentEpisode.value?.titlePt}
                         </p>
                     </div>
 
@@ -265,21 +265,21 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
             >
                 {waitingForChoice && (
                     <p style="text-align: center; font-size: 13px; color: var(--accent);">
-                        ↑ Сделайте выбор
+                        ↑ Faça sua escolha
                     </p>
                 )}
 
                 {episodeComplete && (
                     <div style="padding-top: 8px;">
                         <p style="text-align: center; font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text-secondary);">
-                            Эпизод завершён
+                            Episódio concluído!
                         </p>
 
                         {nextEpisodeInfo ? (
                             <button onClick={goToNextEpisode} class="btn-primary" style="margin-bottom: 8px;">
                                 {nextEpisodeInfo.isPaywalled && !currentUser.value?.hasUnlimited
-                                    ? 'Разблокировать следующий'
-                                    : 'Следующий эпизод →'
+                                    ? 'Desbloquear próximo'
+                                    : 'Próximo episódio →'
                                 }
                             </button>
                         ) : (
@@ -288,7 +288,7 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
                                 class="btn-secondary"
                                 style="margin-bottom: 8px;"
                             >
-                                Вернуться к истории
+                                Voltar para a história
                             </button>
                         )}
                     </div>
@@ -296,13 +296,13 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
 
                 {!isTyping && !waitingForChoice && !episodeComplete && hasMoreScenes && (
                     <p style="text-align: center; font-size: 13px; color: var(--text-muted);">
-                        Тапните для продолжения
+                        Toque para continuar
                     </p>
                 )}
 
                 {isTyping && (
                     <p style="text-align: center; font-size: 13px; color: var(--text-muted);">
-                        печатает...
+                        digitando...
                     </p>
                 )}
             </div>
@@ -335,8 +335,8 @@ function renderScene(
                             <div class="attachment-header">
                                 <div class="attachment-icon">📄</div>
                                 <div class="attachment-info">
-                                    <p class="attachment-name">Документ</p>
-                                    <p class="attachment-size">текст</p>
+                                    <p class="attachment-name">Documento</p>
+                                    <p class="attachment-size">texto</p>
                                 </div>
                             </div>
                             <p class="attachment-content">"{scene.payload.text}"</p>

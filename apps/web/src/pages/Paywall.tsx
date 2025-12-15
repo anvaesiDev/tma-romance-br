@@ -124,7 +124,6 @@ export function PaywallScreen({ seriesSlug }: PaywallScreenProps) {
                                 '🔓 Tudo do Unlimited',
                                 '⏩ Acesso antecipado +5 episódios',
                                 '👑 Rotas e finais VIP exclusivos',
-                                '🎧 Versões em áudio (em breve)',
                             ]}
                             featured={false}
                             onPurchase={handlePurchase}
@@ -133,8 +132,29 @@ export function PaywallScreen({ seriesSlug }: PaywallScreenProps) {
                     </div>
                 </section>
 
+                {/* Trust signals */}
+                <section class="space-y-4">
+                    {/* Secure purchase */}
+                    <div class="flex items-center gap-3 p-4 rounded-xl bg-dark-card border border-dark-border">
+                        <span class="text-2xl">🔒</span>
+                        <div>
+                            <p class="font-semibold text-sm">Compra segura</p>
+                            <p class="text-xs text-gray-400">Processado pelo Telegram Stars</p>
+                        </div>
+                    </div>
+
+                    {/* How to buy */}
+                    <div class="p-4 rounded-xl bg-dark-card border border-dark-border">
+                        <p class="font-semibold text-sm mb-2">💡 Como comprar Estrelas</p>
+                        <p class="text-xs text-gray-400">
+                            Você pode recarregar Estrelas com Pix via Google Play ou App Store.
+                            O pagamento é seguro e instantâneo.
+                        </p>
+                    </div>
+                </section>
+
                 {/* Support link */}
-                <div class="text-center text-sm text-gray-500">
+                <div class="text-center text-sm text-gray-500 pb-4">
                     <p>Problemas com pagamento?</p>
                     <button class="text-primary-400 underline">
                         Ajuda: /paysupport

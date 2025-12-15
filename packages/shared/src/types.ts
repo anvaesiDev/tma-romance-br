@@ -181,16 +181,16 @@ export type SkuId = keyof typeof SKU_CATALOG;
 
 // ---- Tropes ----
 export const TROPES = [
-    { id: 'contract', labelPt: 'Casamento por Contrato', labelRu: 'Брак по контракту', emoji: '💍' },
-    { id: 'ceo', labelPt: 'CEO / Bilionário', labelRu: 'CEO / Миллиардер', emoji: '💼' },
-    { id: 'mafia', labelPt: 'Máfia / Protetor', labelRu: 'Мафия / Защитник', emoji: '🔫' },
-    { id: 'secret_identity', labelPt: 'Identidade Secreta', labelRu: 'Тайная личность', emoji: '🎭' },
-    { id: 'revenge', labelPt: 'Vingança', labelRu: 'Месть', emoji: '⚔️' },
-    { id: 'academy', labelPt: 'Academia / Fantasia', labelRu: 'Академия / Фэнтези', emoji: '🏰' },
-    { id: 'second_chance', labelPt: 'Segunda Chance', labelRu: 'Второй шанс', emoji: '💔' },
-    { id: 'fake_relationship', labelPt: 'Relacionamento Falso', labelRu: 'Фиктивные отношения', emoji: '💋' },
-    { id: 'celebrity', labelPt: 'Celebridade', labelRu: 'Знаменитость', emoji: '⭐' },
-    { id: 'lost_heiress', labelPt: 'Herdeira Perdida', labelRu: 'Потерянная наследница', emoji: '👑' },
+    { id: 'contract', labelPt: 'Casamento por Contrato', emoji: '💍' },
+    { id: 'ceo', labelPt: 'CEO / Bilionário', emoji: '💼' },
+    { id: 'mafia', labelPt: 'Máfia / Protetor', emoji: '🔫' },
+    { id: 'secret_identity', labelPt: 'Identidade Secreta', emoji: '🎭' },
+    { id: 'revenge', labelPt: 'Vingança', emoji: '⚔️' },
+    { id: 'academy', labelPt: 'Academia / Fantasia', emoji: '🏰' },
+    { id: 'second_chance', labelPt: 'Segunda Chance', emoji: '💔' },
+    { id: 'fake_relationship', labelPt: 'Relacionamento Falso', emoji: '💋' },
+    { id: 'celebrity', labelPt: 'Celebridade', emoji: '⭐' },
+    { id: 'lost_heiress', labelPt: 'Herdeira Perdida', emoji: '👑' },
 ] as const;
 
 export type TropeId = typeof TROPES[number]['id'];

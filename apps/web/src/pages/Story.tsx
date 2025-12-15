@@ -53,7 +53,7 @@ export function StoryScreen({ slug }: StoryScreenProps) {
         return (
             <div class="screen items-center justify-center">
                 <div class="text-4xl animate-pulse">📖</div>
-                <p class="text-gray-400 mt-4">Загрузка истории…</p>
+                <p class="text-gray-400 mt-4">Carregando história...</p>
             </div>
         );
     }
@@ -72,7 +72,7 @@ export function StoryScreen({ slug }: StoryScreenProps) {
                     class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
                 >
                     <span>←</span>
-                    <span>Назад</span>
+                    <span>Voltar</span>
                 </button>
             </div>
 
@@ -86,7 +86,7 @@ export function StoryScreen({ slug }: StoryScreenProps) {
                     <h1 class="text-title-lg">{series.titlePt}</h1>
 
                     <p class="text-gray-400 mt-2 text-sm">
-                        {series.episodes.length} эпизодов • ~{totalMinutes} мин
+                        {series.episodes.length} episódios • ~{totalMinutes} min
                     </p>
                 </div>
 
@@ -94,12 +94,12 @@ export function StoryScreen({ slug }: StoryScreenProps) {
                 <div class="flex flex-wrap justify-center gap-2">
                     {primaryTrope && (
                         <span class="trope-chip">
-                            {primaryTrope.emoji} {primaryTrope.labelRu || primaryTrope.labelPt}
+                            {primaryTrope.emoji} {primaryTrope.labelPt}
                         </span>
                     )}
                     {secondaryTrope && (
                         <span class="trope-chip">
-                            {secondaryTrope.emoji} {secondaryTrope.labelRu || secondaryTrope.labelPt}
+                            {secondaryTrope.emoji} {secondaryTrope.labelPt}
                         </span>
                     )}
                 </div>
@@ -111,7 +111,7 @@ export function StoryScreen({ slug }: StoryScreenProps) {
 
                 {/* Episodes list */}
                 <section>
-                    <h2 class="text-lg font-semibold mb-3">Эпизоды</h2>
+                    <h2 class="text-lg font-semibold mb-3">Episódios</h2>
                     <div class="space-y-2">
                         {series.episodes.map((ep, index) => (
                             <button
@@ -127,7 +127,7 @@ export function StoryScreen({ slug }: StoryScreenProps) {
                                         <div>
                                             <p class="font-medium">{ep.titlePt}</p>
                                             <p class="text-xs text-gray-500">
-                                                ~{Math.ceil(ep.estimatedSeconds / 60)} мин
+                                                ~{Math.ceil(ep.estimatedSeconds / 60)} min
                                             </p>
                                         </div>
                                     </div>
@@ -150,7 +150,7 @@ export function StoryScreen({ slug }: StoryScreenProps) {
                     onClick={() => navigate({ page: 'reader', seriesSlug: slug, episodeNumber: 0 })}
                     class="btn-primary"
                 >
-                    Начать читать
+                    Começar a ler
                 </button>
             </div>
         </div>

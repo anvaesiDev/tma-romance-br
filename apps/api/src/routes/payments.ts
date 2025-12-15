@@ -5,9 +5,12 @@ import { authMiddleware } from './auth.js';
 import { SKU_CATALOG } from '@tma-romance/shared';
 import { getUserId } from '../utils/auth.js';
 
+// ==========================================
+// User-facing routes (require JWT auth)
+// ==========================================
 export const paymentsRoutes = new Hono();
 
-// Use auth middleware for all routes
+// Auth middleware for user routes only
 paymentsRoutes.use('*', authMiddleware);
 
 const CreateInvoiceSchema = z.object({
@@ -46,7 +49,7 @@ paymentsRoutes.post('/create-invoice', async (c) => {
         data: {
             userId,
             eventName: 'purchase_start',
-            props: { sku, starsAmount: skuConfig.stars },
+            props: JSON.stringify({ sku, starsAmount: skuConfig.stars }),
         },
     });
 
@@ -92,87 +95,6 @@ paymentsRoutes.post('/create-invoice', async (c) => {
         console.error('Error creating invoice:', error);
         return c.json({ error: 'Failed to create invoice' }, 500);
     }
-});
-
-/**
- * POST /api/payments/webhook
- * Handle Telegram payment webhook (called by bot)
- */
-paymentsRoutes.post('/webhook', async (c) => {
-    // This would typically be called by the bot when it receives successful_payment
-    // For security, verify webhook secret
-    const webhookSecret = c.req.header('X-Webhook-Secret');
-
-    if (webhookSecret !== process.env.BOT_WEBHOOK_SECRET) {
-        return c.json({ error: 'Unauthorized' }, 401);
-    }
-
-    const body = await c.req.json();
-    const { invoicePayload, telegramChargeId, providerPaymentId } = body;
-
-    // Find payment by payload
-    const payment = await prisma.payment.findFirst({
-        where: { invoicePayload },
-    });
-
-    if (!payment) {
-        return c.json({ error: 'Payment not found' }, 404);
-    }
-
-    // Idempotency check
-    if (payment.status === 'paid') {
-        return c.json({ success: true, alreadyProcessed: true });
-    }
-
-    // Update payment as paid
-    await prisma.payment.update({
-        where: { id: payment.id },
-        data: {
-            status: 'paid',
-            telegramChargeId,
-            providerPaymentId,
-            paidAt: new Date(),
-        },
-    });
-
-    // Grant entitlement based on SKU
-    const sku = payment.sku as keyof typeof SKU_CATALOG;
-
-    if (sku.startsWith('keys_')) {
-        // Add keys to balance
-        const keysToAdd = sku === 'keys_5' ? 5 : sku === 'keys_15' ? 15 : 40;
-
-        await prisma.keysBalance.upsert({
-            where: { userId: payment.userId },
-            update: { balance: { increment: keysToAdd } },
-            create: { userId: payment.userId, balance: keysToAdd },
-        });
-    } else {
-        // Create subscription entitlement
-        const endsAt = new Date();
-        endsAt.setDate(endsAt.getDate() + 30); // 30 days
-
-        await prisma.entitlement.create({
-            data: {
-                userId: payment.userId,
-                type: sku,
-                source: 'stars',
-                endsAt,
-                status: 'active',
-            },
-        });
-    }
-
-    // Track event
-    await prisma.event.create({
-        data: {
-            userId: payment.userId,
-            eventName: 'purchase_success',
-            props: { sku: payment.sku, starsAmount: payment.starsAmount },
-        },
-    });
-
-    return c.json({ success: true });
 });
 
 /**
@@ -237,7 +159,7 @@ paymentsRoutes.post('/mock-complete', async (c) => {
         data: {
             userId,
             eventName: 'purchase_success',
-            props: { sku: payment.sku, starsAmount: payment.starsAmount, mock: true },
+            props: JSON.stringify({ sku: payment.sku, starsAmount: payment.starsAmount, mock: true }),
         },
     });
 
@@ -277,4 +199,138 @@ paymentsRoutes.get('/entitlements', async (c) => {
         hasUnlimited: entitlements.some((e) => e.type === 'sub_core' || e.type === 'sub_vip'),
         hasVip: entitlements.some((e) => e.type === 'sub_vip'),
     });
+});
+
+// ==========================================
+// Bot webhook routes (NO auth middleware)
+// ==========================================
+export const webhookRoutes = new Hono();
+
+// Zod schema for strict webhook payload validation
+const WebhookPayloadSchema = z.object({
+    invoicePayload: z.string().min(1),
+    telegramChargeId: z.string().min(1),
+    providerPaymentId: z.string().optional(),
+    totalAmount: z.number().optional(),
+    userId: z.string().optional(),
+});
+
+/**
+ * POST /api/webhook/payment
+ * Handle Telegram payment webhook (called by bot)
+ * 
+ * This route is NOT protected by authMiddleware.
+ * It uses X-Webhook-Secret header for bot authentication.
+ */
+webhookRoutes.post('/payment', async (c) => {
+    const webhookSecret = c.req.header('X-Webhook-Secret');
+
+    // Validate webhook secret
+    if (!process.env.BOT_WEBHOOK_SECRET) {
+        console.error('❌ BOT_WEBHOOK_SECRET not configured');
+        return c.json({ error: 'Webhook not configured' }, 500);
+    }
+
+    if (webhookSecret !== process.env.BOT_WEBHOOK_SECRET) {
+        console.warn('⚠️ Webhook auth failed - invalid secret');
+        return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // Parse and validate body
+    let body: unknown;
+    try {
+        body = await c.req.json();
+    } catch {
+        console.error('❌ Webhook failed to parse JSON body');
+        return c.json({ error: 'Invalid JSON body' }, 400);
+    }
+
+    const parsed = WebhookPayloadSchema.safeParse(body);
+    if (!parsed.success) {
+        console.error('❌ Webhook payload validation failed:', parsed.error.format());
+        return c.json({ error: 'Invalid payload', details: parsed.error.format() }, 400);
+    }
+
+    const { invoicePayload, telegramChargeId, providerPaymentId } = parsed.data;
+
+    // Find payment by payload
+    const payment = await prisma.payment.findFirst({
+        where: { invoicePayload },
+    });
+
+    if (!payment) {
+        console.error(`❌ Webhook: Payment not found for payload: ${invoicePayload}`);
+        return c.json({ error: 'Payment not found' }, 404);
+    }
+
+    // Idempotency check - if already processed, return success
+    if (payment.status === 'paid') {
+        console.log(`✅ Webhook: Payment already processed (idempotent): ${payment.id}`);
+        return c.json({ success: true, alreadyProcessed: true });
+    }
+
+    // Also check by telegramChargeId for extra idempotency
+    const existingByChargeId = await prisma.payment.findFirst({
+        where: { telegramChargeId, status: 'paid' },
+    });
+
+    if (existingByChargeId) {
+        console.log(`✅ Webhook: Duplicate telegramChargeId detected: ${telegramChargeId}`);
+        return c.json({ success: true, alreadyProcessed: true });
+    }
+
+    // Update payment as paid
+    await prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+            status: 'paid',
+            telegramChargeId,
+            providerPaymentId,
+            paidAt: new Date(),
+        },
+    });
+
+    // Grant entitlement based on SKU
+    const sku = payment.sku as keyof typeof SKU_CATALOG;
+
+    if (sku.startsWith('keys_')) {
+        // Add keys to balance
+        const keysToAdd = sku === 'keys_5' ? 5 : sku === 'keys_15' ? 15 : 40;
+
+        await prisma.keysBalance.upsert({
+            where: { userId: payment.userId },
+            update: { balance: { increment: keysToAdd } },
+            create: { userId: payment.userId, balance: keysToAdd },
+        });
+
+        console.log(`✅ Webhook: Granted ${keysToAdd} keys to user ${payment.userId}`);
+    } else {
+        // Create subscription entitlement
+        const endsAt = new Date();
+        endsAt.setDate(endsAt.getDate() + 30); // 30 days
+
+        await prisma.entitlement.create({
+            data: {
+                userId: payment.userId,
+                type: sku,
+                source: 'stars',
+                endsAt,
+                status: 'active',
+            },
+        });
+
+        console.log(`✅ Webhook: Granted ${sku} subscription to user ${payment.userId}`);
+    }
+
+    // Track event
+    await prisma.event.create({
+        data: {
+            userId: payment.userId,
+            eventName: 'purchase_success',
+            props: JSON.stringify({ sku: payment.sku, starsAmount: payment.starsAmount }),
+        },
+    });
+
+    console.log(`✅ Webhook: Payment ${payment.id} processed successfully`);
+    return c.json({ success: true });
 });

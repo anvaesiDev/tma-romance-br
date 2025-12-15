@@ -8,7 +8,7 @@ import { authRoutes } from './routes/auth.js';
 import { seriesRoutes } from './routes/series.js';
 import { episodesRoutes } from './routes/episodes.js';
 import { progressRoutes } from './routes/progress.js';
-import { paymentsRoutes } from './routes/payments.js';
+import { paymentsRoutes, webhookRoutes } from './routes/payments.js';
 import { usersRoutes } from './routes/users.js';
 
 // Initialize Prisma
@@ -22,7 +22,7 @@ app.use('*', logger());
 app.use('*', cors({
     origin: ['https://tma-romance-br-web.vercel.app', 'http://localhost:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Webhook-Secret'],
     credentials: true,
     maxAge: 86400,
 }));
@@ -36,6 +36,7 @@ app.route('/api/series', seriesRoutes);
 app.route('/api/episodes', episodesRoutes);
 app.route('/api/progress', progressRoutes);
 app.route('/api/payments', paymentsRoutes);
+app.route('/api/webhook', webhookRoutes);  // Bot webhook (no auth)
 app.route('/api/users', usersRoutes);
 
 // 404 handler

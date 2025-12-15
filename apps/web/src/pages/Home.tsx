@@ -3,6 +3,9 @@ import { currentUser, seriesList, progressList, navigate, isLoading } from '../s
 import { fetchSeriesList, fetchProgress, claimDailyKeys } from '../api';
 import { SeriesCard } from '../components/SeriesCard';
 import { KeysBar } from '../components/KeysBar';
+import { ptBR } from '@tma-romance/shared';
+
+const t = ptBR;
 
 export function HomeScreen() {
     useEffect(() => {
@@ -26,10 +29,10 @@ export function HomeScreen() {
     const handleClaimKeys = async () => {
         try {
             const result = await claimDailyKeys();
-            alert(`🎉 +${result.keysGranted} ключей! (${result.streakDays} дней подряд)`);
+            alert(`🎉 +${result.keysGranted} chaves! (${result.streakDays} dias seguidos)`);
         } catch (err: any) {
             if (err.message?.includes('already claimed')) {
-                alert('Вы уже получили ключи сегодня. Возвращайтесь завтра!');
+                alert('Você já pegou suas chaves hoje. Volte amanhã!');
             }
         }
     };
@@ -65,10 +68,10 @@ export function HomeScreen() {
                     <div>
                         <h1 class="text-title">
                             {currentUser.value?.displayName
-                                ? `Привет, ${currentUser.value.displayName}!`
-                                : 'Привет! 💕'}
+                                ? `Oi, ${currentUser.value.displayName}! 💕`
+                                : 'Oi! 💕'}
                         </h1>
-                        <p class="text-sm text-gray-400 mt-1">Что почитаем сегодня?</p>
+                        <p class="text-sm text-gray-400 mt-1">O que vamos ler hoje?</p>
                     </div>
 
                     <button
@@ -94,7 +97,7 @@ export function HomeScreen() {
                 {/* Continue reading */}
                 {continueItem && (
                     <section>
-                        <h2 class="text-lg font-semibold mb-3">📖 Продолжить</h2>
+                        <h2 class="text-lg font-semibold mb-3">📖 {t.home.continueReading}</h2>
                         <button
                             onClick={() => navigate({
                                 page: 'reader',
@@ -110,9 +113,9 @@ export function HomeScreen() {
                                 <div class="flex-1 min-w-0">
                                     <p class="font-semibold truncate">{continueItem.seriesTitle}</p>
                                     <p class="text-sm text-gray-400">
-                                        Эп. {continueItem.episodeNumber}: {continueItem.episodeTitle}
+                                        Ep. {continueItem.episodeNumber}: {continueItem.episodeTitle}
                                     </p>
-                                    <p class="text-xs text-primary-400 mt-1">Продолжить →</p>
+                                    <p class="text-xs text-primary-400 mt-1">{t.home.continue} →</p>
                                 </div>
                             </div>
                         </button>
@@ -122,7 +125,7 @@ export function HomeScreen() {
                 {/* For You (personalized) */}
                 {recommendedSeries.length > 0 && (
                     <section>
-                        <h2 class="text-lg font-semibold mb-3">✨ Для вас</h2>
+                        <h2 class="text-lg font-semibold mb-3">✨ {t.home.title}</h2>
                         <div class="grid grid-cols-2 gap-3">
                             {recommendedSeries.slice(0, 4).map((series) => (
                                 <SeriesCard
@@ -137,7 +140,7 @@ export function HomeScreen() {
 
                 {/* All Series */}
                 <section>
-                    <h2 class="text-lg font-semibold mb-3">📚 Все истории</h2>
+                    <h2 class="text-lg font-semibold mb-3">📚 Todas as histórias</h2>
                     <div class="grid grid-cols-2 gap-3">
                         {allSeries.map((series) => (
                             <SeriesCard
@@ -153,9 +156,9 @@ export function HomeScreen() {
                 {allSeries.length === 0 && !isLoading.value && (
                     <div class="text-center py-12">
                         <p class="text-4xl mb-4">📚</p>
-                        <p class="text-gray-400">Нет доступных историй</p>
+                        <p class="text-gray-400">Nenhuma história disponível</p>
                         <button onClick={refreshData} class="btn-secondary mt-4">
-                            Попробовать снова
+                            {t.errors.tryAgain}
                         </button>
                     </div>
                 )}

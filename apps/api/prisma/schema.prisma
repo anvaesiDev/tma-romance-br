@@ -169,6 +169,18 @@ model KeysBalance {
   @@map("keys_balance")
 }
 
+// Explicit episode unlocks (prevents auto-deduction on GET)
+model EpisodeUnlock {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  episodeId  String   @map("episode_id")
+  method     String   // key | sub_core | sub_vip
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  @@unique([userId, episodeId])
+  @@map("episode_unlocks")
+}
+
 // ==========================================
 // Analytics Models
 // ==========================================

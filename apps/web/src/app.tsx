@@ -1,5 +1,5 @@
 import { useEffect } from 'preact/hooks';
-import { currentRoute, isLoading, error, currentUser } from './store';
+import { currentRoute, isLoading, error, currentUser, navigate } from './store';
 import { authenticateTelegram, fetchSeriesList, fetchProgress } from './api';
 
 // Pages
@@ -15,7 +15,63 @@ export function App() {
     // Initialize app on mount
     useEffect(() => {
         initializeApp();
+
+        // Initialize Telegram WebApp
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
     }, []);
+
+    // Manage Telegram BackButton visibility based on current route
+    useEffect(() => {
+        const route = currentRoute.value;
+        const backButton = window.Telegram?.WebApp?.BackButton;
+
+        if (!backButton) return;
+
+        // Show BackButton on all pages except home/loading
+        const shouldShowBack = route.page !== 'home' && route.page !== 'loading';
+
+        if (shouldShowBack) {
+            backButton.show();
+        } else {
+            backButton.hide();
+        }
+
+        // Handle BackButton click
+        const handleBack = () => {
+            switch (route.page) {
+                case 'onboarding':
+                    // Can't go back from onboarding
+                    break;
+                case 'story':
+                    navigate({ page: 'home' });
+                    break;
+                case 'reader':
+                    navigate({ page: 'story', slug: route.seriesSlug });
+                    break;
+                case 'paywall':
+                    if (route.seriesSlug) {
+                        navigate({ page: 'story', slug: route.seriesSlug });
+                    } else {
+                        navigate({ page: 'home' });
+                    }
+                    break;
+                case 'settings':
+                    navigate({ page: 'home' });
+                    break;
+                default:
+                    navigate({ page: 'home' });
+            }
+        };
+
+        backButton.onClick(handleBack);
+
+        return () => {
+            backButton.offClick(handleBack);
+        };
+    }, [currentRoute.value]);
 
     return (
         <div class="screen">
@@ -26,7 +82,7 @@ export function App() {
                         onClick={() => error.value = null}
                         class="mt-2 text-xs underline"
                     >
-                        Закрыть
+                        Fechar
                     </button>
                 </div>
             )}
@@ -75,7 +131,7 @@ async function initializeApp() {
         }
     } catch (err) {
         console.error('Failed to initialize app:', err);
-        error.value = 'Ошибка загрузки. Попробуйте ещё раз.';
+        error.value = 'Erro ao carregar. Tente novamente.';
     } finally {
         isLoading.value = false;
     }

@@ -1,7 +1,9 @@
 import { useState } from 'preact/hooks';
-import { TROPES } from '@tma-romance/shared';
+import { TROPES, ptBR } from '@tma-romance/shared';
 import { completeOnboarding } from '../api';
 import { isLoading } from '../store';
+
+const t = ptBR;
 
 export function OnboardingScreen() {
     const [step, setStep] = useState(0);
@@ -37,9 +39,9 @@ export function OnboardingScreen() {
             <div class="screen-header">
                 <div class="flex items-center justify-between">
                     <h1 class="text-lg font-semibold">
-                        {step === 0 && '💕 Что вы хотите читать?'}
-                        {step === 1 && '🔥 Какая интенсивность?'}
-                        {step === 2 && '✨ Как вас называть?'}
+                        {step === 0 && t.onboarding.step1Title}
+                        {step === 1 && t.onboarding.step2Title}
+                        {step === 2 && t.onboarding.step3Title}
                     </h1>
                     <span class="text-sm text-gray-400">{step + 1}/3</span>
                 </div>
@@ -56,7 +58,7 @@ export function OnboardingScreen() {
             <div class="screen-content">
                 {step === 0 && (
                     <div class="space-y-4">
-                        <p class="text-gray-400 text-sm">Выберите до 3 любимых жанров</p>
+                        <p class="text-gray-400 text-sm">{t.onboarding.step1Subtitle}</p>
                         <div class="grid grid-cols-2 gap-3">
                             {TROPES.map((trope) => (
                                 <button
@@ -68,7 +70,7 @@ export function OnboardingScreen() {
                                         }`}
                                 >
                                     <span class="text-2xl block mb-2">{trope.emoji}</span>
-                                    <span class="text-sm font-medium">{trope.labelRu || trope.labelPt}</span>
+                                    <span class="text-sm font-medium">{trope.labelPt}</span>
                                 </button>
                             ))}
                         </div>
@@ -77,7 +79,7 @@ export function OnboardingScreen() {
 
                 {step === 1 && (
                     <div class="space-y-4">
-                        <p class="text-gray-400 text-sm">Выберите уровень романтики</p>
+                        <p class="text-gray-400 text-sm">{t.onboarding.step2Subtitle}</p>
                         <div class="space-y-3">
                             <button
                                 onClick={() => setIntensity('mild')}
@@ -87,9 +89,9 @@ export function OnboardingScreen() {
                                     }`}
                             >
                                 <span class="text-2xl block mb-2">🌸</span>
-                                <span class="font-semibold block">Мягкий</span>
+                                <span class="font-semibold block">{t.intensity.mild.title}</span>
                                 <span class="text-sm text-gray-400 mt-1 block">
-                                    Сладкий романс, эмоциональное напряжение, поцелуи
+                                    {t.intensity.mild.description}
                                 </span>
                             </button>
 
@@ -101,9 +103,9 @@ export function OnboardingScreen() {
                                     }`}
                             >
                                 <span class="text-2xl block mb-2">🔥</span>
-                                <span class="font-semibold block">Интенсивный</span>
+                                <span class="font-semibold block">{t.intensity.bold.title}</span>
                                 <span class="text-sm text-gray-400 mt-1 block">
-                                    Сильная химия, страстные сцены (без откровенного контента)
+                                    {t.intensity.bold.description}
                                 </span>
                             </button>
                         </div>
@@ -113,18 +115,18 @@ export function OnboardingScreen() {
                 {step === 2 && (
                     <div class="space-y-4">
                         <p class="text-gray-400 text-sm">
-                            Необязательно: как вас называть в историях?
+                            {t.onboarding.step3Subtitle}
                         </p>
                         <input
                             type="text"
-                            placeholder="Ваше имя (или псевдоним)"
+                            placeholder={t.onboarding.step3Placeholder}
                             value={displayName}
                             onInput={(e) => setDisplayName((e.target as HTMLInputElement).value)}
                             class="input-field"
                             maxLength={50}
                         />
                         <p class="text-xs text-gray-500">
-                            Можете пропустить или изменить позже в настройках
+                            {t.onboarding.step3Hint}
                         </p>
                     </div>
                 )}
@@ -137,7 +139,7 @@ export function OnboardingScreen() {
                             onClick={() => setStep(step - 1)}
                             class="btn-secondary flex-1"
                         >
-                            Назад
+                            {t.onboarding.btnBack}
                         </button>
                     )}
 
@@ -147,7 +149,7 @@ export function OnboardingScreen() {
                             disabled={step === 0 && selectedTropes.length === 0}
                             class="btn-primary flex-1"
                         >
-                            Далее
+                            {t.onboarding.btnNext}
                         </button>
                     ) : (
                         <button
@@ -155,7 +157,7 @@ export function OnboardingScreen() {
                             disabled={isLoading.value}
                             class="btn-primary flex-1"
                         >
-                            {isLoading.value ? 'Сохранение…' : 'Начать читать'}
+                            {isLoading.value ? t.onboarding.btnSaving : t.onboarding.btnStart}
                         </button>
                     )}
                 </div>

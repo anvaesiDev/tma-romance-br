@@ -103,6 +103,7 @@ bot.on('pre_checkout_query', async (ctx) => {
 
 /**
  * Successful payment - grant entitlement
+ * Notifies API with retry logic for reliability
  */
 bot.on('message:successful_payment', async (ctx) => {
     const payment = ctx.message.successful_payment;
@@ -113,27 +114,59 @@ bot.on('message:successful_payment', async (ctx) => {
         telegramChargeId: payment.telegram_payment_charge_id,
     });
 
-    // Notify API about successful payment
-    try {
-        await fetch(`${API_URL}/api/payments/webhook`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Webhook-Secret': WEBHOOK_SECRET,
-            },
-            body: JSON.stringify({
-                invoicePayload: payment.invoice_payload,
-                telegramChargeId: payment.telegram_payment_charge_id,
-                providerPaymentId: payment.provider_payment_charge_id,
-                totalAmount: payment.total_amount,
-                userId: ctx.from?.id?.toString(),
-            }),
-        });
-    } catch (err) {
-        console.error('Failed to notify API:', err);
+    // Notify API about successful payment with retry logic
+    const maxRetries = 3;
+    const baseDelayMs = 1000;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(`${API_URL}/api/webhook/payment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Webhook-Secret': WEBHOOK_SECRET,
+                },
+                body: JSON.stringify({
+                    invoicePayload: payment.invoice_payload,
+                    telegramChargeId: payment.telegram_payment_charge_id,
+                    providerPaymentId: payment.provider_payment_charge_id,
+                    totalAmount: payment.total_amount,
+                    userId: ctx.from?.id?.toString(),
+                }),
+            });
+
+            if (response.ok) {
+                const result = await response.json() as { success?: boolean; alreadyProcessed?: boolean };
+                console.log(`✅ Webhook delivered (attempt ${attempt}):`, result);
+                break; // Success, exit retry loop
+            } else {
+                const errorBody = await response.text();
+                console.error(`❌ Webhook failed (attempt ${attempt}/${maxRetries}):`, {
+                    status: response.status,
+                    body: errorBody,
+                });
+
+                if (attempt === maxRetries) {
+                    console.error('❌ All webhook retries exhausted, payment may need manual processing');
+                } else {
+                    // Exponential backoff
+                    const delay = baseDelayMs * Math.pow(2, attempt - 1);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        } catch (err) {
+            console.error(`❌ Webhook error (attempt ${attempt}/${maxRetries}):`, err);
+
+            if (attempt === maxRetries) {
+                console.error('❌ All webhook retries exhausted');
+            } else {
+                const delay = baseDelayMs * Math.pow(2, attempt - 1);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
     }
 
-    // Send confirmation to user
+    // Send confirmation to user (always, even if webhook fails)
     await ctx.reply(
         `✅ *Pagamento confirmado!*\n\n` +
         `Obrigado pela sua compra. Seu acesso foi atualizado.\n\n` +
