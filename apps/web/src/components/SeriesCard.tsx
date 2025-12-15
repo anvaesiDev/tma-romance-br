@@ -26,12 +26,12 @@ export function SeriesCard({ series, onClick }: SeriesCardProps) {
             <div class="series-card-overlay" />
 
             <div class="absolute bottom-0 left-0 right-0 p-3">
-                <div class="h-10 flex flex-col justify-end">
+                <div class="h-10 flex items-center mb-1">
                     <p class="font-semibold text-sm leading-tight line-clamp-2 w-full">
                         {series.titlePt}
                     </p>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">
+                <p class="text-xs text-gray-400 truncate">
                     {series.episodeCount} ep. • {trope?.labelPt}
                 </p>
             </div>
