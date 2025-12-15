@@ -30,5 +30,8 @@ RUN pnpm --filter @tma-romance/api build
 # Expose port
 EXPOSE 3000
 
-# Start script that runs migrations then starts the server
-CMD cd apps/api && npx prisma db push --skip-generate && cd /app && node apps/api/dist/index.js
+# Create startup script
+RUN echo '#!/bin/sh\ncd /app/apps/api && npx prisma db push --skip-generate && cd /app && node apps/api/dist/index.js' > /app/start.sh && chmod +x /app/start.sh
+
+# Start
+CMD ["/bin/sh", "/app/start.sh"]
