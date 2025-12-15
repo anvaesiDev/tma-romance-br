@@ -344,8 +344,8 @@ body {
 }
 
 .screen-footer {
-  @apply sticky bottom-0 px-4 py-3 z-10;
-  padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
+  @apply sticky bottom-0 px-4 py-4 z-10;
+  padding-bottom: max(env(safe-area-inset-bottom, 20px), 24px);
   background: rgba(15, 15, 15, 0.98);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
