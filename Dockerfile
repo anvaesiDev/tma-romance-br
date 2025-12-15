@@ -1,6 +1,7 @@
 FROM node:22-slim
 
-# Install pnpm
+# Install pnpm and OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -17,8 +18,10 @@ RUN pnpm install --frozen-lockfile
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
 
-# Build shared and api
-RUN pnpm --filter @tma-romance/shared build 2>/dev/null || true
+# Generate Prisma client
+RUN cd apps/api && pnpm db:generate
+
+# Build API
 RUN pnpm --filter @tma-romance/api build
 
 # Expose port
