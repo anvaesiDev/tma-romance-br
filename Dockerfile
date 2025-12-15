@@ -2,7 +2,7 @@ FROM node:22-slim
 
 # Install pnpm and OpenSSL for Prisma
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-RUN npm install -g pnpm
+RUN npm install -g pnpm tsx
 
 WORKDIR /app
 
@@ -27,11 +27,12 @@ RUN cd apps/api && pnpm db:generate
 # Build API
 RUN pnpm --filter @tma-romance/api build
 
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Expose port
 EXPOSE 3000
-
-# Create startup script
-RUN echo '#!/bin/sh\ncd /app/apps/api && npx prisma db push --skip-generate && cd /app && node apps/api/dist/index.js' > /app/start.sh && chmod +x /app/start.sh
 
 # Start
 CMD ["/bin/sh", "/app/start.sh"]
