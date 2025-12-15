@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
-COPY packages/shared/package.json ./packages/shared/
+COPY packages/shared/package.json packages/shared/tsconfig.json ./packages/shared/
 COPY apps/api/package.json ./apps/api/
 
 # Install dependencies
@@ -17,6 +17,9 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
+
+# Build shared package first
+RUN pnpm --filter @tma-romance/shared build
 
 # Generate Prisma client
 RUN cd apps/api && pnpm db:generate
