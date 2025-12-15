@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
+import path from 'path';
 
 export default defineConfig({
     plugins: [preact()],
@@ -34,6 +35,7 @@ export default defineConfig({
         alias: {
             react: 'preact/compat',
             'react-dom': 'preact/compat',
+            '@tma-romance/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
         },
     },
 });
