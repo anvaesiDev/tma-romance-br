@@ -1,0 +1,20 @@
+{
+    "name": "@tma-romance/bot",
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "dependencies": {
+        "grammy": "^1.30.0",
+        "dotenv": "^16.4.0",
+        "@tma-romance/shared": "workspace:*"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3",
+        "tsx": "^4.19.0",
+        "@types/node": "^22.9.0"
+    }
+}

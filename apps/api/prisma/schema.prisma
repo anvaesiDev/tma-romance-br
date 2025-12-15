@@ -1,0 +1,205 @@
+// Prisma schema for TMA Romance BR
+// Based on MVP_Tech_Spec_TMA_BR.md Section 8
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Core Domain Models
+// ==========================================
+
+model User {
+  id                   String    @id @default(uuid())
+  tgUserId             BigInt    @unique @map("tg_user_id")
+  username             String?
+  locale               String    @default("pt-BR")
+  tzOffset             Int       @default(-3) @map("tz_offset")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  lastSeenAt           DateTime  @default(now()) @map("last_seen_at")
+  
+  // Onboarding
+  onboardingComplete   Boolean   @default(false) @map("onboarding_complete")
+  selectedTropes       Json    @default("[]") @map("selected_tropes")
+  intensity            String    @default("mild")
+  displayName          String?   @map("display_name")
+  
+  // Marketing attribution
+  marketingSourceFirst String?   @map("marketing_source_first")
+  marketingSourceLast  String?   @map("marketing_source_last")
+  
+  // Relations
+  progress             Progress[]
+  entitlements         Entitlement[]
+  payments             Payment[]
+  keysBalance          KeysBalance?
+  events               Event[]
+  
+  @@map("users")
+}
+
+model Series {
+  id             String    @id @default(uuid())
+  slug           String    @unique
+  titlePt        String    @map("title_pt")
+  descriptionPt  String    @map("description_pt")
+  coverAssetUrl  String?   @map("cover_asset_url")
+  tropePrimary   String    @map("trope_primary")
+  tropeSecondary String?   @map("trope_secondary")
+  tags           Json    @default("[]")
+  maturityLevel  String    @default("SFW") @map("maturity_level") // SFW | BOLD
+  status         String    @default("draft") // draft | published
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  episodes       Episode[]
+  progress       Progress[]
+  
+  @@map("series")
+}
+
+model Episode {
+  id               String    @id @default(uuid())
+  seriesId         String    @map("series_id")
+  number           Int
+  titlePt          String    @map("title_pt")
+  status           String    @default("draft") // draft | published
+  releaseAt        DateTime? @map("release_at")
+  estimatedSeconds Int       @default(180) @map("estimated_seconds")
+  isPaywalled      Boolean   @default(false) @map("is_paywalled")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  series           Series    @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  scenes           Scene[]
+  progress         Progress[]
+  
+  @@unique([seriesId, number])
+  @@map("episodes")
+}
+
+model Scene {
+  id        String   @id @default(uuid())
+  episodeId String   @map("episode_id")
+  ordinal   Int
+  type      String   // chat | message_card | voice_card | image_card | system_card | choice
+  payload   Json
+  
+  // Relations
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  
+  @@unique([episodeId, ordinal])
+  @@map("scenes")
+}
+
+model Progress {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  seriesId   String   @map("series_id")
+  episodeId  String   @map("episode_id")
+  sceneOrdinal Int    @default(0) @map("scene_ordinal")
+  routeFlags Json   @default("{}") @map("route_flags")
+  meters     Json   @default("{}") // relationship meters
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  series     Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  episode    Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, seriesId])
+  @@map("progress")
+}
+
+// ==========================================
+// Monetization Models
+// ==========================================
+
+model Entitlement {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String    // sub_core | sub_vip | keys_pack | season_pass
+  source    String    @default("stars") // stars | test
+  startsAt  DateTime  @default(now()) @map("starts_at")
+  endsAt    DateTime? @map("ends_at")
+  status    String    @default("active") // active | expired | revoked
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("entitlements")
+}
+
+model Payment {
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  sku              String
+  starsAmount      Int       @map("stars_amount")
+  status           String    @default("pending") // pending | paid | refunded | failed
+  invoicePayload   String?   @map("invoice_payload")
+  telegramChargeId String?   @unique @map("telegram_charge_id")
+  providerPaymentId String?  @map("provider_payment_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  paidAt           DateTime? @map("paid_at")
+  
+  // Relations
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("payments")
+}
+
+model KeysBalance {
+  id                 String    @id @default(uuid())
+  userId             String    @unique @map("user_id")
+  balance            Int       @default(3) // Start with 3 free keys
+  dailyKeysClaimedAt DateTime? @map("daily_keys_claimed_at")
+  streakDays         Int       @default(0) @map("streak_days")
+  lastStreakAt       DateTime? @map("last_streak_at")
+  
+  // Relations
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("keys_balance")
+}
+
+// ==========================================
+// Analytics Models
+// ==========================================
+
+model Event {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  sessionId String?  @map("session_id")
+  sourceId  String?  @map("source_id")
+  eventName String   @map("event_name")
+  props     Json   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, eventName])
+  @@index([createdAt])
+  @@map("events")
+}
+
+// ==========================================
+// Affiliate Tracking
+// ==========================================
+
+model AffiliateSource {
+  id        String   @id @default(uuid())
+  sourceId  String   @unique @map("source_id")
+  kind      String   // channel | affiliate | paid
+  metadata  Json   @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@map("affiliate_sources")
+}

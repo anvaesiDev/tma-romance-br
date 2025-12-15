@@ -1,0 +1,489 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================
+   TMA Romance - Clean Dark Theme
+   ========================================== */
+
+:root {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #1f1f1f;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --accent: #e85d75;
+  --accent-muted: rgba(232, 93, 117, 0.15);
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+html {
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply font-sans antialiased;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+/* ==========================================
+   Chat Messages
+   ========================================== */
+
+.msg {
+  @apply max-w-[80%];
+  animation: msgIn 0.25s ease-out;
+}
+
+.msg-in {
+  @apply mr-auto;
+}
+
+.msg-out {
+  @apply ml-auto;
+}
+
+@keyframes msgIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.msg-name {
+  @apply text-xs mb-1 ml-3 font-medium;
+  color: var(--accent);
+}
+
+.msg-bubble {
+  @apply px-4 py-2.5 text-[15px] leading-relaxed rounded-2xl;
+}
+
+.msg-in .msg-bubble {
+  @apply rounded-bl-sm;
+  background: var(--bg-card);
+}
+
+.msg-out .msg-bubble {
+  @apply rounded-br-sm text-white;
+  background: var(--accent);
+}
+
+/* Narrator */
+.narrator {
+  @apply text-center py-4 px-6 text-sm italic;
+  color: var(--text-secondary);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================
+   Toast Notifications
+   ========================================== */
+
+.toast-container {
+  @apply fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+}
+
+.toast {
+  @apply flex items-center gap-3 p-3 rounded-xl pointer-events-auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  animation: toastIn 0.3s ease-out;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-icon {
+  @apply w-9 h-9 rounded-lg flex items-center justify-center text-lg;
+  background: var(--accent-muted);
+}
+
+.toast-content {
+  @apply flex-1;
+}
+
+.toast-title {
+  @apply text-sm font-semibold;
+  color: var(--text-primary);
+}
+
+.toast-text {
+  @apply text-sm mt-0.5;
+  color: var(--text-secondary);
+}
+
+/* ==========================================
+   Attachments
+   ========================================== */
+
+.attachment {
+  @apply max-w-[260px] mr-auto;
+  animation: msgIn 0.25s ease-out;
+}
+
+.attachment-inner {
+  @apply rounded-xl overflow-hidden;
+  background: var(--bg-card);
+}
+
+.attachment-header {
+  @apply flex items-center gap-3 p-3;
+}
+
+.attachment-icon {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center text-xl;
+  background: #f59e0b;
+}
+
+.attachment-info {
+  @apply flex-1;
+}
+
+.attachment-name {
+  @apply text-sm font-medium;
+  color: var(--text-primary);
+}
+
+.attachment-size {
+  @apply text-xs;
+  color: var(--text-muted);
+}
+
+.attachment-content {
+  @apply p-3 pt-0 text-sm italic border-t mt-0;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+/* Image */
+.msg-image {
+  @apply max-w-[240px] mr-auto;
+  animation: msgIn 0.25s ease-out;
+}
+
+.msg-image-inner {
+  @apply rounded-xl overflow-hidden;
+  background: var(--bg-card);
+}
+
+.msg-image-placeholder {
+  @apply aspect-[4/3] flex items-center justify-center text-5xl;
+  background: var(--bg-secondary);
+}
+
+.msg-image-caption {
+  @apply p-2 text-sm;
+  color: var(--text-secondary);
+}
+
+/* Voice */
+.msg-voice {
+  @apply max-w-[260px] mr-auto;
+  animation: msgIn 0.25s ease-out;
+}
+
+.msg-voice-inner {
+  @apply flex items-center gap-3 p-3 rounded-2xl rounded-bl-sm;
+  background: var(--bg-card);
+}
+
+.voice-play {
+  @apply w-9 h-9 rounded-full flex items-center justify-center text-white text-sm;
+  background: var(--accent);
+}
+
+.voice-bars {
+  @apply flex items-center gap-0.5 h-6 flex-1;
+}
+
+.voice-bar {
+  @apply w-0.5 rounded-full;
+  background: var(--text-muted);
+}
+
+.voice-meta {
+  @apply text-xs mt-1;
+  color: var(--text-muted);
+}
+
+/* ==========================================
+   Choices
+   ========================================== */
+
+.choices {
+  @apply p-4;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.choice-label {
+  @apply text-center text-sm mb-3;
+  color: var(--text-muted);
+}
+
+.choice-btn {
+  @apply w-full p-4 mb-2 rounded-xl text-[15px] text-left transition-all;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.choice-btn:hover {
+  border-color: var(--accent);
+}
+
+.choice-btn:active {
+  transform: scale(0.98);
+}
+
+.choice-btn:disabled {
+  @apply opacity-40;
+}
+
+/* ==========================================
+   Typing
+   ========================================== */
+
+.typing {
+  @apply flex items-center gap-1 px-4 py-3 rounded-2xl rounded-bl-sm w-fit;
+  background: var(--bg-card);
+  animation: msgIn 0.25s ease-out;
+}
+
+.typing-dot {
+  @apply w-1.5 h-1.5 rounded-full;
+  background: var(--text-muted);
+  animation: typingPulse 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typingPulse {
+
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+  }
+
+  30% {
+    opacity: 1;
+  }
+}
+
+/* ==========================================
+   Layout
+   ========================================== */
+
+.screen {
+  @apply min-h-screen flex flex-col;
+  min-height: 100dvh;
+  background: var(--bg-primary);
+}
+
+.screen-header {
+  @apply sticky top-0 z-10 p-4 safe-top;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.screen-content {
+  @apply flex-1 p-4;
+}
+
+.screen-footer {
+  @apply sticky bottom-0 p-4 safe-bottom;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+}
+
+/* ==========================================
+   Buttons
+   ========================================== */
+
+.btn-primary {
+  @apply w-full py-4 px-6 rounded-xl font-semibold text-white transition-all;
+  background: var(--accent);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  @apply opacity-50;
+}
+
+.btn-secondary {
+  @apply w-full py-4 px-6 rounded-xl font-medium transition-all;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-secondary);
+}
+
+/* ==========================================
+   Input
+   ========================================== */
+
+.input-field {
+  @apply w-full py-3 px-4 rounded-xl outline-none transition-all;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+}
+
+/* ==========================================
+   Cards
+   ========================================== */
+
+.series-card {
+  @apply relative overflow-hidden rounded-2xl transition-transform;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.series-card:active {
+  transform: scale(0.98);
+}
+
+.series-card-cover {
+  @apply w-full aspect-[3/4] object-cover;
+}
+
+.series-card-overlay {
+  @apply absolute inset-0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 50%);
+}
+
+.trope-chip {
+  @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm;
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+
+.trope-chip-selected {
+  background: var(--accent);
+  color: white;
+}
+
+.keys-bar {
+  @apply flex items-center gap-2 px-4 py-2 rounded-full;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.paywall-card {
+  @apply p-5 rounded-2xl;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.paywall-card-featured {
+  border-color: var(--accent);
+}
+
+/* ==========================================
+   Utilities
+   ========================================== */
+
+.text-title {
+  @apply text-xl font-bold;
+}
+
+.text-title-lg {
+  @apply text-2xl font-bold;
+}
+
+.chat-container {
+  @apply flex flex-col gap-2;
+}
+
+/* Animations */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: msgIn 0.25s ease-out;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#8B1459" />
+    
+    <title>Romance Interativo | Histórias que você escolhe</title>
+    <meta name="description" content="Escolha o final. Histórias românticas interativas no Telegram. 2 minutos por episódio." />
+    
+    <!-- Telegram Mini App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Preconnect to API -->
+    <link rel="preconnect" href="/" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <style>
+      /* Critical CSS for instant feedback */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #0B0F14;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+      }
+      
+      #app {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+      
+      .splash {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        gap: 16px;
+      }
+      
+      .splash-logo {
+        font-size: 48px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+      
+      .splash-text {
+        color: #9CA3AF;
+        font-size: 14px;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Splash screen while JS loads -->
+      <div class="splash">
+        <div class="splash-logo">💕</div>
+        <div class="splash-text">Carregando…</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

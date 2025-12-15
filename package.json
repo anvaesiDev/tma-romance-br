@@ -1,0 +1,19 @@
+{
+    "name": "tma-romance-br",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "pnpm -r --parallel dev",
+        "build": "pnpm -r build",
+        "db:generate": "pnpm --filter api db:generate",
+        "db:push": "pnpm --filter api db:push",
+        "db:seed": "pnpm --filter api db:seed",
+        "test": "pnpm -r test"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}
