@@ -1,14 +1,15 @@
 #!/bin/sh
 
-SCHEMA="/app/apps/api/prisma/schema.prisma"
-SEED="/app/apps/api/prisma/seed.ts"
+cd /app/apps/api
 
 echo "Running database migrations..."
-npx prisma db push --schema="$SCHEMA"
+# Use local prisma from node_modules to avoid version mismatch
+./node_modules/.bin/prisma db push --schema="prisma/schema.prisma"
 
 echo "Checking if seed needed..."
-# Just run seed - it will handle the logic internally
-npx tsx "$SEED" || echo "Seed completed or skipped"
+# Run seed with tsx
+npx tsx prisma/seed.ts || echo "Seed completed or skipped"
 
 echo "Starting API..."
+ls -la /app/apps/api/dist || echo "dist directory not found"
 exec node /app/apps/api/dist/index.js
