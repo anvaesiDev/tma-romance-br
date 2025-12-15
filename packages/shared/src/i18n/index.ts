@@ -1,1 +1,1 @@
-export * from './ptBR';
+export * from './ptBR.js';
