@@ -30,11 +30,11 @@ body {
 }
 
 .safe-top {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
 }
 
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
 }
 
 ::-webkit-scrollbar {
@@ -325,24 +325,30 @@ body {
 .screen {
   @apply min-h-screen flex flex-col;
   min-height: 100dvh;
+  min-height: -webkit-fill-available;
   background: var(--bg-primary);
 }
 
 .screen-header {
-  @apply sticky top-0 z-10 p-4 safe-top;
-  background: rgba(15, 15, 15, 0.95);
-  backdrop-filter: blur(12px);
+  @apply sticky top-0 z-10 px-4 py-3;
+  padding-top: max(env(safe-area-inset-top, 12px), 12px);
+  background: rgba(15, 15, 15, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
 
 .screen-content {
-  @apply flex-1 p-4;
+  @apply flex-1 p-4 overflow-y-auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen-footer {
-  @apply sticky bottom-0 p-4 safe-bottom;
-  background: rgba(15, 15, 15, 0.95);
-  backdrop-filter: blur(12px);
+  @apply sticky bottom-0 px-4 py-3 z-10;
+  padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
+  background: rgba(15, 15, 15, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
 }
 
