@@ -1,7 +1,6 @@
 {
-    "$schema": "https://json.schemastore.org/vercel.json",
     "installCommand": "pnpm install --frozen-lockfile",
-    "buildCommand": "pnpm build:web",
+    "buildCommand": "pnpm run build:web",
     "outputDirectory": "apps/web/dist",
     "framework": null
 }
