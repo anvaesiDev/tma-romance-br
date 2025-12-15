@@ -55,8 +55,11 @@ paymentsRoutes.post('/create-invoice', async (c) => {
 
     const botToken = process.env.BOT_TOKEN;
 
-    if (!botToken) {
-        // Mock mode for development
+    // Check if mock payments are enabled explicitly or if bot token is missing
+    const isMockMode = process.env.ENABLE_TEST_PAYMENTS === '1' || !botToken;
+
+    if (isMockMode) {
+        // Mock mode for development or testing
         return c.json({
             invoiceUrl: `mock://invoice/${payment.id}`,
             paymentId: payment.id,
@@ -102,7 +105,10 @@ paymentsRoutes.post('/create-invoice', async (c) => {
  * Complete a mock payment (development only)
  */
 paymentsRoutes.post('/mock-complete', async (c) => {
-    if (process.env.NODE_ENV === 'production') {
+    // Allow if NOT production OR if explicitly enabled
+    const isAllowed = process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEST_PAYMENTS === '1';
+
+    if (!isAllowed) {
         return c.json({ error: 'Not available in production' }, 403);
     }
 
