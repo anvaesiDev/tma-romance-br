@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { prisma } from '../index.js';
 import { authMiddleware } from './auth.js';
+import { getUserId } from '../utils/auth.js';
 
 export const seriesRoutes = new Hono();
 
@@ -83,7 +84,7 @@ seriesRoutes.get('/:slug', async (c) => {
  */
 seriesRoutes.get('/:slug/progress', authMiddleware, async (c) => {
     const slug = c.req.param('slug');
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const series = await prisma.series.findUnique({
         where: { slug },

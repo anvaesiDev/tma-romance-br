@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../index.js';
 import { authMiddleware } from './auth.js';
 import { SKU_CATALOG } from '@tma-romance/shared';
+import { getUserId } from '../utils/auth.js';
 
 export const paymentsRoutes = new Hono();
 
@@ -18,7 +19,7 @@ const CreateInvoiceSchema = z.object({
  * Create a Stars invoice link
  */
 paymentsRoutes.post('/create-invoice', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
     const body = await c.req.json();
     const parsed = CreateInvoiceSchema.safeParse(body);
 
@@ -183,7 +184,7 @@ paymentsRoutes.post('/mock-complete', async (c) => {
         return c.json({ error: 'Not available in production' }, 403);
     }
 
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
     const body = await c.req.json();
     const { paymentId } = body;
 
@@ -248,7 +249,7 @@ paymentsRoutes.post('/mock-complete', async (c) => {
  * Get user's active entitlements
  */
 paymentsRoutes.get('/entitlements', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const entitlements = await prisma.entitlement.findMany({
         where: {

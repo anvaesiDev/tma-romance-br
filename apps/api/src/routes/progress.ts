@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { prisma } from '../index.js';
 import { authMiddleware } from './auth.js';
+import { getUserId } from '../utils/auth.js';
 
 export const progressRoutes = new Hono();
 
@@ -21,7 +22,7 @@ const SaveProgressSchema = z.object({
  * Save user progress
  */
 progressRoutes.post('/', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
     const body = await c.req.json();
     const parsed = SaveProgressSchema.safeParse(body);
 
@@ -60,7 +61,7 @@ progressRoutes.post('/', async (c) => {
  * Get all user progress (for continue cards)
  */
 progressRoutes.get('/', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const progressList = await prisma.progress.findMany({
         where: { userId },
@@ -105,7 +106,7 @@ progressRoutes.get('/', async (c) => {
  * Mark episode as complete
  */
 progressRoutes.post('/complete-episode', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
     const body = await c.req.json();
 
     const { seriesId, episodeId, secondsSpent } = body;
@@ -152,7 +153,7 @@ progressRoutes.post('/complete-episode', async (c) => {
  * Track choice made
  */
 progressRoutes.post('/choice', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
     const body = await c.req.json();
 
     const { choiceId, optionId, routeFlags, meters } = body;

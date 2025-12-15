@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { prisma } from '../index.js';
 import { authMiddleware } from './auth.js';
+import { getUserId } from '../utils/auth.js';
 
 export const usersRoutes = new Hono();
 
@@ -19,7 +20,7 @@ const OnboardingSchema = z.object({
  * Get current user info
  */
 usersRoutes.get('/me', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -64,7 +65,7 @@ usersRoutes.get('/me', async (c) => {
  * Complete onboarding
  */
 usersRoutes.post('/onboarding', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
     const body = await c.req.json();
     const parsed = OnboardingSchema.safeParse(body);
 
@@ -109,7 +110,7 @@ usersRoutes.post('/onboarding', async (c) => {
  * Claim daily free keys
  */
 usersRoutes.post('/claim-daily-keys', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const keysBalance = await prisma.keysBalance.findUnique({
         where: { userId },
@@ -171,7 +172,7 @@ usersRoutes.post('/claim-daily-keys', async (c) => {
  * Get user reading stats
  */
 usersRoutes.get('/stats', async (c) => {
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const [episodesCompleted, choicesMade, totalProgress] = await Promise.all([
         prisma.event.count({

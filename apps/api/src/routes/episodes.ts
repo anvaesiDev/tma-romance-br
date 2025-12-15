@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { prisma } from '../index.js';
 import { authMiddleware } from './auth.js';
+import { getUserId } from '../utils/auth.js';
 
 export const episodesRoutes = new Hono();
 
@@ -10,7 +11,7 @@ export const episodesRoutes = new Hono();
  */
 episodesRoutes.get('/:id', authMiddleware, async (c) => {
     const id = c.req.param('id');
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const episode = await prisma.episode.findUnique({
         where: { id },
@@ -86,7 +87,7 @@ episodesRoutes.get('/:id', authMiddleware, async (c) => {
 episodesRoutes.get('/by-number/:seriesSlug/:number', authMiddleware, async (c) => {
     const seriesSlug = c.req.param('seriesSlug');
     const number = parseInt(c.req.param('number'));
-    const userId = c.get('userId') as string;
+    const userId = getUserId(c);
 
     const series = await prisma.series.findUnique({
         where: { slug: seriesSlug },
