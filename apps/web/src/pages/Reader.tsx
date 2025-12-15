@@ -258,7 +258,11 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
             </div>
 
             {/* Footer */}
-            <div class="screen-footer" onClick={(e) => e.stopPropagation()}>
+            <div
+                class="screen-footer"
+                onClick={(e) => e.stopPropagation()}
+                style={{ paddingBottom: episodeComplete ? '40px' : undefined }}
+            >
                 {waitingForChoice && (
                     <p style="text-align: center; font-size: 13px; color: var(--accent);">
                         ↑ Сделайте выбор
@@ -266,13 +270,13 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
                 )}
 
                 {episodeComplete && (
-                    <div>
-                        <p style="text-align: center; font-size: 14px; font-weight: 500; margin-bottom: 12px;">
+                    <div style="padding-top: 8px;">
+                        <p style="text-align: center; font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text-secondary);">
                             Эпизод завершён
                         </p>
 
                         {nextEpisodeInfo ? (
-                            <button onClick={goToNextEpisode} class="btn-primary">
+                            <button onClick={goToNextEpisode} class="btn-primary" style="margin-bottom: 8px;">
                                 {nextEpisodeInfo.isPaywalled && !currentUser.value?.hasUnlimited
                                     ? 'Разблокировать следующий'
                                     : 'Следующий эпизод →'
@@ -282,6 +286,7 @@ export function ReaderScreen({ seriesSlug, episodeNumber }: ReaderScreenProps) {
                             <button
                                 onClick={() => navigate({ page: 'story', slug: seriesSlug })}
                                 class="btn-secondary"
+                                style="margin-bottom: 8px;"
                             >
                                 Вернуться к истории
                             </button>
