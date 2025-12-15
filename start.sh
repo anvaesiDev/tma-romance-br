@@ -1,21 +1,17 @@
 #!/bin/sh
 
-cd /app/apps/api
-
 echo "Running database migrations..."
-npx prisma db push --skip-generate
+npx --prefix /app/apps/api prisma db push --skip-generate
 
 echo "Checking if seed needed..."
-# Check if Series table has any rows
-RESULT=$(npx prisma db execute --stdin <<< "SELECT COUNT(*) as count FROM \"Series\"" 2>&1 || true)
+SERIES_COUNT=$(npx --prefix /app/apps/api prisma db execute --stdin <<< "SELECT COUNT(*) FROM \"Series\"" 2>&1 | grep -o '[0-9]*' | tail -1 || echo "0")
 
-if echo "$RESULT" | grep -q '"count": 0' || echo "$RESULT" | grep -q 'count.*0' || echo "$RESULT" | grep -q 'does not exist'; then
-  echo "No series found or table missing, running seed..."
-  npx tsx prisma/seed.ts
+if [ "$SERIES_COUNT" = "0" ] || [ -z "$SERIES_COUNT" ]; then
+  echo "No series found, running seed..."
+  npx --prefix /app/apps/api tsx /app/apps/api/prisma/seed.ts
 else
-  echo "Data exists, skipping seed"
+  echo "Data exists ($SERIES_COUNT series), skipping seed"
 fi
 
-cd /app
 echo "Starting API..."
-exec node apps/api/dist/index.js
+exec node /app/apps/api/dist/index.js
