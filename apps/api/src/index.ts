@@ -20,9 +20,11 @@ const app = new Hono();
 // Middleware
 app.use('*', logger());
 app.use('*', cors({
-    origin: '*', // In production, restrict to your domain
+    origin: ['https://tma-romance-br-web.vercel.app', 'http://localhost:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    maxAge: 86400,
 }));
 
 // Health check
